@@ -3,11 +3,11 @@ module github.com/borerer/nlib-app-kv
 go 1.19
 
 require (
-	github.com/borerer/nlib-go v0.0.0-20221218084519-0499b1abe7a0
+	github.com/borerer/nlib-go v0.0.0-20221218131205-d3c3bbef466f
 	go.mongodb.org/mongo-driver v1.11.1
 )
 
-replace github.com/borerer/nlib-go v0.0.0-20221218084519-0499b1abe7a0 => ../nlib-go
+// replace github.com/borerer/nlib-go v0.0.0-20221218084519-0499b1abe7a0 => ../nlib-go
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect

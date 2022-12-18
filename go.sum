@@ -1,5 +1,7 @@
 github.com/borerer/nlib-go v0.0.0-20221218084519-0499b1abe7a0 h1:gM1cHOYW99nj2ap6XJ8YSLKe6luJOv2o2MvtfdpuF2I=
 github.com/borerer/nlib-go v0.0.0-20221218084519-0499b1abe7a0/go.mod h1:q+Cgu7vUkuBs0tglOeTuXQ0Jl+hAcQpC2vxvxh7cBEg=
+github.com/borerer/nlib-go v0.0.0-20221218131205-d3c3bbef466f h1:cfZa+Y1d5yS9h4hQJYyadZqEd5kZOQ7xP7tS8ruz9o0=
+github.com/borerer/nlib-go v0.0.0-20221218131205-d3c3bbef466f/go.mod h1:q+Cgu7vUkuBs0tglOeTuXQ0Jl+hAcQpC2vxvxh7cBEg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
