@@ -11,7 +11,7 @@ const (
 	CollectionKV = "kv"
 )
 
-func (mc *MongoClient) SetKey(key string, value string) error {
+func (mc *MongoClient) SetKey(key string, value interface{}) error {
 	var doc DBKV
 	err := mc.FindOneDocument(CollectionKV, FilterEquals("key", key), &doc)
 	if err != nil {
@@ -35,7 +35,7 @@ func (mc *MongoClient) SetKey(key string, value string) error {
 // returned error:
 //  1. ErrNoDocuments
 //  2. others
-func (mc *MongoClient) GetKey(key string) (string, error) {
+func (mc *MongoClient) GetKey(key string) (interface{}, error) {
 	var doc DBKV
 	err := mc.FindOneDocument(CollectionKV, FilterEquals("key", key), &doc)
 	if errors.Is(err, mongo.ErrNoDocuments) {
