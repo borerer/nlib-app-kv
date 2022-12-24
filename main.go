@@ -32,6 +32,12 @@ func restore(v interface{}) interface{} {
 	switch t := v.(type) {
 	case string:
 		return t
+	case bool:
+		return t
+	case float64:
+		return t
+	case primitive.A:
+		return t
 	case primitive.D:
 		return t.Map()
 	default:
