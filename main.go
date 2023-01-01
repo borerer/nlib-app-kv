@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/borerer/nlib-app-kv/database"
-	nlibgo "github.com/borerer/nlib-go"
+	nlib "github.com/borerer/nlib-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -48,7 +48,7 @@ func restore(v interface{}) interface{} {
 	}
 }
 
-func getKey(in map[string]interface{}) interface{} {
+func getKey(in nlib.SimpleFunctionIn) nlib.SimpleFunctionOut {
 	key, err := mustString(in, "key")
 	if err != nil {
 		return err.Error()
@@ -60,7 +60,7 @@ func getKey(in map[string]interface{}) interface{} {
 	return restore(val)
 }
 
-func setKey(in map[string]interface{}) interface{} {
+func setKey(in nlib.SimpleFunctionIn) nlib.SimpleFunctionOut {
 	key, err := mustString(in, "key")
 	if err != nil {
 		return err.Error()
@@ -81,6 +81,12 @@ func wait() {
 	<-ch
 }
 
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	mongoClient = database.NewMongoClient(&database.MongoConfig{
 		URI:      os.Getenv("NLIB_MONGO_URI"),
@@ -90,7 +96,9 @@ func main() {
 		println(err.Error())
 		return
 	}
-	nlib := nlibgo.NewClient(os.Getenv("NLIB_SERVER"), "kv")
+	nlib.SetEndpoint(os.Getenv("NLIB_SERVER"))
+	nlib.SetAppID("kv")
+	must(nlib.Connect())
 	nlib.RegisterFunction("get", getKey)
 	nlib.RegisterFunction("set", setKey)
 	wait()
