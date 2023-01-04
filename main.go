@@ -2,89 +2,66 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"os"
-	"reflect"
 
 	"github.com/borerer/nlib-app-kv/database"
 	nlib "github.com/borerer/nlib-go"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/borerer/nlib-go/har"
 )
 
 var (
 	mongoClient *database.MongoClient
 )
 
-func mustString(in map[string]interface{}, key string) (string, error) {
-	raw, ok := in[key]
-	if !ok {
-		return "", fmt.Errorf("missing %s", key)
+func getQuery(req *nlib.FunctionIn, key string) string {
+	for _, query := range req.QueryString {
+		if query.Name == key {
+			return query.Value
+		}
 	}
-	str, ok := raw.(string)
-	if !ok {
-		return "", fmt.Errorf("invalid type %s", key)
-	}
-	return str, nil
+	return ""
 }
 
-func restore(v interface{}) interface{} {
-	switch t := v.(type) {
-	case string:
-		return t
-	case bool:
-		return t
-	case float64:
-		return t
-	case primitive.A:
-		return t
-	case primitive.D:
-		return t.Map()
-	default:
-		println(reflect.TypeOf(v).String())
-		buf, _ := json.Marshal(v)
-		println(string(buf))
-		return t
-	}
-}
-
-func getKey(in nlib.SimpleFunctionIn) nlib.SimpleFunctionOut {
-	key, err := mustString(in, "key")
-	if err != nil {
-		return err.Error()
-	}
+func getKey(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
+	key := getQuery(req, "key")
 	val, err := mongoClient.GetKey(key)
 	if err != nil {
-		return err.Error()
+		return har.Error(err), nil
 	}
-	return restore(val)
+	return har.Text(val), nil
 }
 
-func setKey(in nlib.SimpleFunctionIn) nlib.SimpleFunctionOut {
-	key, err := mustString(in, "key")
-	if err != nil {
-		return err.Error()
+func parseKeyValue(req *nlib.FunctionIn) (string, string) {
+	if req.Method == "GET" {
+		return getQuery(req, "key"), getQuery(req, "value")
+	} else if req.Method == "POST" || req.Method == "PUT" {
+		if req.PostData != nil && req.PostData.Text != nil {
+			var j map[string]interface{}
+			err := json.Unmarshal([]byte(*req.PostData.Text), &j)
+			if err == nil {
+				key := j["key"].(string)
+				switch value := j["value"].(type) {
+				case string:
+					return key, value
+				default:
+					buf, err := json.Marshal(value)
+					if err == nil {
+						return key, string(buf)
+					}
+				}
+			}
+		}
 	}
-	value, ok := in["value"]
-	if !ok {
-		return errors.New("missing value")
-	}
-	err = mongoClient.SetKey(key, value)
-	if err != nil {
-		return err.Error()
-	}
-	return "ok"
+	return "", ""
 }
 
-func wait() {
-	ch := make(chan bool)
-	<-ch
-}
-
-func must(err error) {
+func setKey(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
+	key, value := parseKeyValue(req)
+	err := mongoClient.SetKey(key, value)
 	if err != nil {
-		panic(err)
+		return har.Error(err), nil
 	}
+	return har.Text("ok"), nil
 }
 
 func main() {
@@ -92,14 +69,11 @@ func main() {
 		URI:      os.Getenv("NLIB_MONGO_URI"),
 		Database: os.Getenv("NLIB_MONGO_DATABASE"),
 	})
-	if err := mongoClient.Start(); err != nil {
-		println(err.Error())
-		return
-	}
+	nlib.Must(mongoClient.Start())
 	nlib.SetEndpoint(os.Getenv("NLIB_SERVER"))
 	nlib.SetAppID("kv")
-	must(nlib.Connect())
+	nlib.Must(nlib.Connect())
 	nlib.RegisterFunction("get", getKey)
 	nlib.RegisterFunction("set", setKey)
-	wait()
+	nlib.Wait()
 }
