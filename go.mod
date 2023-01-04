@@ -3,7 +3,7 @@ module github.com/borerer/nlib-app-kv
 go 1.19
 
 require (
-	github.com/borerer/nlib-go v0.0.0-20230104144551-8a7fbcfcb2d9
+	github.com/borerer/nlib-go v0.0.0-20230104153718-e3934cbde16b
 	go.mongodb.org/mongo-driver v1.11.1
 )
 

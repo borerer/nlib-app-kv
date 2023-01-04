@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"net/http"
 	"os"
 
 	"github.com/borerer/nlib-app-kv/database"
@@ -25,16 +27,26 @@ func getQuery(req *nlib.FunctionIn, key string) string {
 func getKey(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
 	key := getQuery(req, "key")
 	val, err := mongoClient.GetKey(key)
-	if err != nil {
+	if errors.Is(err, database.ErrNoDocuments) {
+		return har.NewResponse(http.StatusNotFound, "not found", ""), nil
+	} else if err != nil {
 		return har.Error(err), nil
 	}
 	return har.Text(val), nil
 }
 
-func parseKeyValue(req *nlib.FunctionIn) (string, string) {
-	if req.Method == "GET" {
-		return getQuery(req, "key"), getQuery(req, "value")
-	} else if req.Method == "POST" || req.Method == "PUT" {
+func setKeyGET(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
+	key := getQuery(req, "key")
+	value := getQuery(req, "value")
+	err := mongoClient.SetKey(key, value)
+	if err != nil {
+		return har.Error(err), nil
+	}
+	return har.Text("ok"), nil
+}
+
+func setKeyPOST(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
+	parseKeyValue := func(req *nlib.FunctionIn) (string, string) {
 		if req.PostData != nil && req.PostData.Text != nil {
 			var j map[string]interface{}
 			err := json.Unmarshal([]byte(*req.PostData.Text), &j)
@@ -51,17 +63,24 @@ func parseKeyValue(req *nlib.FunctionIn) (string, string) {
 				}
 			}
 		}
+		return "", ""
 	}
-	return "", ""
-}
 
-func setKey(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
 	key, value := parseKeyValue(req)
 	err := mongoClient.SetKey(key, value)
 	if err != nil {
 		return har.Error(err), nil
 	}
 	return har.Text("ok"), nil
+}
+
+func setKey(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
+	if req.Method == "GET" {
+		return setKeyGET(req)
+	} else if req.Method == "POST" || req.Method == "PUT" {
+		return setKeyPOST(req)
+	}
+	return har.NewResponse(http.StatusMethodNotAllowed, "method not allowed", ""), nil
 }
 
 func main() {

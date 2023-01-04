@@ -1,6 +1,8 @@
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/borerer/nlib-go v0.0.0-20230104144551-8a7fbcfcb2d9 h1:SvT47UPK5LDzcBZe2RWYrBXSAPJXbgnW4erQWj2Pmro=
 github.com/borerer/nlib-go v0.0.0-20230104144551-8a7fbcfcb2d9/go.mod h1:wqmJX+wqtouzOT0Rmhvi24vVZchXeIYeOZSzoCuj6SY=
+github.com/borerer/nlib-go v0.0.0-20230104153718-e3934cbde16b h1:MwmuRNhOfEzQMQtEZEhqcyXvqnPNL6NgthJKalKe2S4=
+github.com/borerer/nlib-go v0.0.0-20230104153718-e3934cbde16b/go.mod h1:wqmJX+wqtouzOT0Rmhvi24vVZchXeIYeOZSzoCuj6SY=
 github.com/borerer/nlib-shared/go v0.0.0-20230104135517-93c1b787066e h1:mGS3ZTKZceHkTHCCOO+hP5XUJ8QdjxjVX9eMHYCtBmI=
 github.com/borerer/nlib-shared/go v0.0.0-20230104135517-93c1b787066e/go.mod h1:Tiz/Dc3ncB5B3Xfan/VvgOSBUMfpJGMpDfA2z7IxcnY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
