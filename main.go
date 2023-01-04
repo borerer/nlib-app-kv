@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -48,17 +49,20 @@ func setKeyGET(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
 func setKeyPOST(req *nlib.FunctionIn) (*nlib.FunctionOut, error) {
 	parseKeyValue := func(req *nlib.FunctionIn) (string, string) {
 		if req.PostData != nil && req.PostData.Text != nil {
-			var j map[string]interface{}
-			err := json.Unmarshal([]byte(*req.PostData.Text), &j)
+			buf, err := base64.StdEncoding.DecodeString(*req.PostData.Text)
 			if err == nil {
-				key := j["key"].(string)
-				switch value := j["value"].(type) {
-				case string:
-					return key, value
-				default:
-					buf, err := json.Marshal(value)
-					if err == nil {
-						return key, string(buf)
+				var j map[string]interface{}
+				err := json.Unmarshal(buf, &j)
+				if err == nil {
+					key := j["key"].(string)
+					switch value := j["value"].(type) {
+					case string:
+						return key, value
+					default:
+						buf, err := json.Marshal(value)
+						if err == nil {
+							return key, string(buf)
+						}
 					}
 				}
 			}
